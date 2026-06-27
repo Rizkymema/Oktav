@@ -11,6 +11,7 @@ import { ToolExecutor } from '@/lib/hermes/runtime/tool-executor';
 import { HermesGenerationService } from '@/lib/hermes/services/hermes-generation-service';
 import { resolveHermesReferenceRoot } from '@/lib/hermes/reference/reference-config';
 import type { HermesExecutionMode } from '@/lib/hermes/runtime/runtime-settings-store';
+import { getArtifactWorkingDir } from '@/lib/hermes/runtime/artifact-storage';
 import fs from 'node:fs';
 
 interface MainOrchestratorDeps {
@@ -90,8 +91,8 @@ export const buildRuntimeQuery = (input: {
 IMPORTANT:
 1. Target output: ${input.requestedOutputType ?? 'pdf'}${input.requestedOutputLabel ? ` (${input.requestedOutputLabel})` : ''}.
 2. Output capability: ${input.requestedCapability ?? 'document'}.
-3. If you write, modify, or create any files (such as documents, PDFs, presentasi/Slides, spreadsheets, code files, images, or videos), you MUST save them directly under the directory: "d:/Project Apk-Web/AI ASSISTENT/public/artifacts/".
-4. Use the absolute path "d:/Project Apk-Web/AI ASSISTENT/public/artifacts/[filename]" in your file writing tool. Do not write to any other directory.
+3. If you write, modify, or create any files (such as documents, PDFs, presentasi/Slides, spreadsheets, code files, images, or videos), you MUST save them directly under the directory: "${getArtifactWorkingDir()}/".
+4. Use the absolute path "${getArtifactWorkingDir()}/[filename]" in your file writing tool. Do not write to any other directory.
 `;
 
 export class MainOrchestrator {
@@ -396,7 +397,7 @@ export class MainOrchestrator {
           }
 
           // Scan artifacts directory for newly created files
-          const artifactsDir = 'd:/Project Apk-Web/AI ASSISTENT/public/artifacts/';
+          const artifactsDir = getArtifactWorkingDir();
 
           // Copy newly generated images from Hermes local cache to public/artifacts
           try {

@@ -18,6 +18,7 @@ import { ProgressTracker } from '@/lib/hermes/runtime/progress-tracker';
 import { RuntimeSettingsStore } from '@/lib/hermes/runtime/runtime-settings-store';
 import { ToolExecutor } from '@/lib/hermes/runtime/tool-executor';
 import { StatePersistence } from '@/lib/hermes/runtime/state-persistence';
+import { getArtifactWorkingDir } from '@/lib/hermes/runtime/artifact-storage';
 import { mergeSeedAgentsWithReferenceProfiles } from '@/lib/hermes/reference/reference-agent-sync';
 import { getReferenceSkillDefinitionByName } from '@/lib/hermes/reference/reference-skill-sync';
 import { mergeSeedToolsWithReferenceCatalog } from '@/lib/hermes/reference/reference-tool-sync';
@@ -146,7 +147,7 @@ function syncTaskToProject(task: any) {
     // Hitung total ukuran berkas yang dihasilkan jika sudah selesai
     let totalBytes = 0;
     if (task.status === 'completed' && task.downloadItems) {
-      const artifactsDir = 'd:/Project Apk-Web/AI ASSISTENT/public/artifacts';
+      const artifactsDir = getArtifactWorkingDir();
       for (const item of task.downloadItems) {
         const filePath = path.join(artifactsDir, item.label);
         if (fs.existsSync(filePath)) {

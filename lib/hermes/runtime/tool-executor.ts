@@ -288,7 +288,7 @@ Pastikan component tersebut default exported: 'export default function LandingPa
         }
 
         const relativeUrl = `/artifacts/${filename}`;
-        const absolutePath = path.join(process.cwd(), 'public', 'artifacts', filename);
+        const absolutePath = path.join(getArtifactWorkingDir(), filename);
 
         await fs.promises.mkdir(path.dirname(absolutePath), { recursive: true });
 

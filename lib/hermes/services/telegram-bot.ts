@@ -2,6 +2,7 @@ import { StatePersistence } from '../runtime/state-persistence';
 import { getHermesRuntime } from '../index';
 import { HermesTaskService } from './hermes-task-service';
 import { createArtifactRegistry } from '../artifacts/artifact-registry';
+import { getArtifactWorkingDir } from '../runtime/artifact-storage';
 import { TaskRequestResolver } from './task-request-resolver';
 import { GoogleGenAI } from '@google/genai';
 import fs from 'node:fs';
@@ -443,7 +444,7 @@ export class TelegramBotService {
       // 2. Unggah file yang berhasil dibuat ke Telegram
       if (task.downloadItems && task.downloadItems.length > 0) {
         for (const item of task.downloadItems) {
-          const artifactsDir = 'd:/Project Apk-Web/AI ASSISTENT/public/artifacts';
+          const artifactsDir = getArtifactWorkingDir();
           const filePath = path.join(artifactsDir, item.label);
           
           if (fs.existsSync(filePath)) {
