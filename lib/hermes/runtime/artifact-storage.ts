@@ -40,9 +40,13 @@ export const publishArtifactFile = async (
   }
 
   if (!hasVercelBlobBinding()) {
-    throw new Error(
-      'Video runtime di Vercel memerlukan Blob storage. Set env BLOB_STORE_ID atau BLOB_READ_WRITE_TOKEN terlebih dahulu.',
+    console.warn(
+      'Vercel Blob storage tidak terkonfigurasi. Menggunakan fallback URL lokal untuk artifact.'
     );
+    return {
+      label: input.filename,
+      url: buildLocalArtifactUrl(input.filename),
+    };
   }
 
   const body = await fs.readFile(input.localPath);
