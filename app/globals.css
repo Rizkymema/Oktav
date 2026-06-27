@@ -273,6 +273,7 @@ body {
 .bg-\[\#0a0a09\],
 .bg-\[\#050814\] {
   background-color: #F8FAFC !important;
+  background-image: none !important;
 }
 
 .bg-\[\#11100e\],
@@ -280,47 +281,143 @@ body {
   background-color: #FFFFFF !important;
 }
 
-.border-white\/8,
+/* 2. Card Backgrounds - Map all dark card backgrounds to premium white */
+.bg-\[\#0a0e1c\],
+.bg-\[\#0a0e1c\]\/45,
+.bg-\[\#0a0e1c\]\/60,
+.bg-\[\#0a0e1c\]\/70,
+.bg-\[\#0a0e1c\]\/90,
+.bg-\[\#12110f\]\/70,
+.bg-\[\#12110f\]\/65,
+.bg-\[\#0d0d0b\],
+.bg-\[\#0d0d0b\]\/75,
+.bg-\[\#141311\],
+.bg-\[\#171512\],
+.bg-\[\#050814\]\/75 {
+  background-color: #FFFFFF !important;
+  opacity: 1 !important;
+}
+
+/* 3. Text Colors - Map all light/white texts to dark charcoal/slate */
+.text-white,
+.text-stone-100,
+.text-stone-200,
+.text-stone-300,
+.text-slate-100,
+.text-slate-200,
+.text-slate-300,
+.text-slate-350,
+.text-slate-400,
+.text-\[\#f2dfbe\] {
+  color: #1E293B !important;
+}
+
+/* Subtitles/Muted texts - Map to slate-500/gray */
+.text-stone-400,
+.text-stone-500,
+.text-slate-400,
+.text-slate-500,
+.text-slate-600,
+.text-slate-655 {
+  color: #64748B !important;
+}
+
+/* 4. Borders - Map all dark borders to light slate-200 */
 .border-white\/5,
+.border-white\/8,
 .border-white\/10,
 .border-white\/12,
 .border-white\/15,
 .border-white\/20,
-.border-\[\#d4c2a1\]\/20 {
+.border-\[\#d4c2a1\]\/20,
+.border-\[\#d4c2a1\]\/18 {
   border-color: #E2E8F0 !important;
 }
 
-.text-stone-400,
-.text-stone-500,
-.text-slate-400,
-.text-slate-500 {
-  color: #64748B !important;
+/* 5. Inputs & Select boxes backgrounds and text */
+input[type="text"],
+select,
+textarea {
+  background-color: #FFFFFF !important;
+  color: #1E293B !important;
+  border-color: #CBD5E1 !important;
 }
 
-.text-stone-600,
-.text-slate-655,
-.text-slate-600 {
-  color: #475569 !important;
+input::placeholder,
+textarea::placeholder {
+  color: #94A3B8 !important;
 }
 
-.text-\[\#d4c2a1\],
-.text-\[\#f2dfbe\],
-.text-accent-cyan {
-  color: #0F172A !important;
-}
-
+/* 6. Restore colors for active/primary elements and buttons */
+/* Primary buttons and accents should keep their dark background and white text */
 .bg-accent-cyan,
-.bg-\[\#00d2ff\],
-.bg-\[\#d4c2a1\],
-.bg-black {
+.bg-black,
+.bg-indigo-600,
+.bg-emerald-500,
+.ds-btn-primary {
   background-color: #0F172A !important;
   color: #FFFFFF !important;
 }
 
-.hover\:bg-accent-cyan-hover:hover,
-.hover\:bg-\[\#38bdf8\]:hover,
+.bg-accent-cyan *,
+.ds-btn-primary *,
+.bg-black *,
+.bg-indigo-600 *,
+.bg-emerald-500 * {
+  color: #FFFFFF !important;
+}
+
+/* Restore green text for completed status and checkmarks */
+.text-emerald-400,
+.text-emerald-500 {
+  color: #10B981 !important;
+}
+.bg-emerald-500\/10 {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+}
+
+/* Restore red/rose text for failed status */
+.text-rose-400,
+.text-rose-505,
+.text-rose-500 {
+  color: #EF4444 !important;
+}
+.bg-rose-500\/10 {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Restore yellow/amber text for pending/running status */
+.text-amber-400,
+.text-amber-500 {
+  color: #F59E0B !important;
+}
+.bg-amber-500\/10 {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+}
+
+/* Active buttons/tabs (e.g. filter buttons selected state) */
+.bg-accent-cyan\/15 {
+  background-color: rgba(15, 23, 42, 0.08) !important;
+  color: #0F172A !important;
+  border-color: rgba(15, 23, 42, 0.2) !important;
+}
+
+/* Unselected buttons and hover tabs */
+.bg-white\/5,
+.bg-white\/10 {
+  background-color: #F1F5F9 !important;
+  color: #475569 !important;
+}
+
+.hover\:bg-white\/10:hover,
 .hover\:bg-slate-800:hover {
-  background-color: #1E293B !important;
+  background-color: #E2E8F0 !important;
+}
+
+/* Text selections color */
+::selection {
+  background: rgba(79, 70, 229, 0.15);
+  color: inherit;
 }
 
 /* Bento custom styles */
