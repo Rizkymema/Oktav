@@ -119,6 +119,7 @@ Salin `.env.example` menjadi `.env.local`, lalu isi sesuai kebutuhan.
 - `OPENROUTER_API_KEY`
 - `GEMINI_API_KEY`
 - `GOOGLE_API_KEY`
+- `BLOB_STORE_ID`
 
 ### Reference Workspace
 
@@ -190,6 +191,16 @@ Sistem video saat ini memakai pola berikut:
 1. Runtime mencoba `Genvid` lebih dulu bila `GENVID_ENABLED=true`.
 2. Bila render Genvid berhasil, MP4 final diunduh dan disalin ke `public/artifacts`.
 3. Bila Genvid gagal, runtime fallback ke render MP4 lokal berbasis `ffmpeg-static`.
+
+Untuk deployment `Vercel`, jalur video memakai mode yang berbeda:
+
+1. Runtime merender frame dan MP4 di direktori sementara serverless.
+2. Hasil MP4 dipublikasikan ke `Vercel Blob`.
+3. URL absolut Blob dikirim kembali ke dashboard sebagai artifact task.
+
+Supaya video bisa berfungsi di Vercel, project harus memiliki env:
+
+- `BLOB_STORE_ID`
 
 Konfigurasi default yang paling stabil untuk penggunaan lokal saat ini:
 

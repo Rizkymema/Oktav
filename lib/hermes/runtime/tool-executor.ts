@@ -5,6 +5,10 @@ import { GenvidVideoService } from '@/lib/hermes/video/genvid-service';
 import ffmpegPath from 'ffmpeg-static';
 import { ApprovalManager } from '@/lib/hermes/runtime/approval-manager';
 import { generateArtifactFile, generateImageAsset } from '@/lib/hermes/runtime/artifact-generator';
+import {
+  getArtifactWorkingDir,
+  publishArtifactFile,
+} from '@/lib/hermes/runtime/artifact-storage';
 import { EventBus } from '@/lib/hermes/runtime/event-bus';
 import { PermissionManager } from '@/lib/hermes/runtime/permission-manager';
 import { ToolRegistry } from '@/lib/hermes/registry/tool-registry';
@@ -149,6 +153,22 @@ export class ToolExecutor {
     return (task.requestedOutputType || 'md').toLowerCase();
   }
 
+  private resolveArtifactContentType(extension: string) {
+    switch (extension.toLowerCase()) {
+      case 'png':
+        return 'image/png';
+      case 'jpg':
+      case 'jpeg':
+        return 'image/jpeg';
+      case 'svg':
+        return 'image/svg+xml';
+      case 'mp4':
+        return 'video/mp4';
+      default:
+        return undefined;
+    }
+  }
+
   private async runSafeTool(input: ExecuteToolInput): Promise<ToolExecutionResult> {
     const lowerPrompt = input.task.prompt.toLowerCase();
 
@@ -196,8 +216,7 @@ Gunakan format teks polos yang rapi, padat, dan mudah dipahami.`;
         const outputType = this.resolveOutputType(input.task);
         const normalizedType = ['png', 'jpg', 'jpeg', 'svg'].includes(outputType) ? outputType : 'png';
         const filename = `${slug}.${normalizedType}`;
-        const relativeUrl = `/artifacts/${filename}`;
-        const absolutePath = path.join(process.cwd(), 'public', 'artifacts', filename);
+        const absolutePath = path.join(getArtifactWorkingDir(), filename);
         await generateImageAsset({
           goal: input.task.goal,
           content: input.task.result || input.task.prompt,
@@ -205,12 +224,16 @@ Gunakan format teks polos yang rapi, padat, dan mudah dipahami.`;
           outputType: normalizedType as 'png' | 'jpg' | 'jpeg' | 'svg',
         });
 
+        const artifact = await publishArtifactFile({
+          filename,
+          localPath: absolutePath,
+          contentType: this.resolveArtifactContentType(normalizedType),
+        });
+        this.taskManager.addDownloadItem(input.task.id, artifact);
+
         return {
           content: `Asset visual untuk "${input.task.goal}" berhasil dibuat dalam format ${normalizedType.toUpperCase()}.`,
-          artifact: {
-            label: filename,
-            url: relativeUrl,
-          },
+          artifact,
         };
       }
       case 'sheet.build_dataset': {
@@ -256,12 +279,31 @@ Pastikan component tersebut default exported: 'export default function LandingPa
         }
 
         const filename = `${slug}.${extension}`;
+        const existingArtifact = input.task.downloadItems.find((item) => item.label === filename);
+        if (existingArtifact) {
+          return {
+            content: `Artifact ${existingArtifact.label} berhasil disiapkan.`,
+            artifact: existingArtifact,
+          };
+        }
+
         const relativeUrl = `/artifacts/${filename}`;
         const absolutePath = path.join(process.cwd(), 'public', 'artifacts', filename);
 
         await fs.promises.mkdir(path.dirname(absolutePath), { recursive: true });
 
         if (extension === 'mp4') {
+          const existingArtifact =
+            input.task.downloadItems.find((item) => item.label === filename) ??
+            input.task.downloadItems.find((item) => item.label.endsWith('.mp4'));
+
+          if (existingArtifact) {
+            return {
+              content: `Artifact ${existingArtifact.label} berhasil disiapkan.`,
+              artifact: existingArtifact,
+            };
+          }
+
           if (!fs.existsSync(absolutePath)) {
             return {
               content: 'Artifact video belum tersedia.',
@@ -330,7 +372,8 @@ Pastikan component tersebut default exported: 'export default function LandingPa
   private async runGenvidVideo(input: ExecuteToolInput): Promise<ToolExecutionResult> {
     const config = readGenvidConfig();
     const slug = this.slugify(input.task.goal);
-    const absolutePath = path.join(process.cwd(), 'public', 'artifacts', `${slug}.mp4`);
+    const workingDir = getArtifactWorkingDir();
+    const absolutePath = path.join(workingDir, `${slug}.mp4`);
     const service = new GenvidVideoService(config);
     await service.generateVideo({
       taskId: input.task.id,
@@ -339,10 +382,11 @@ Pastikan component tersebut default exported: 'export default function LandingPa
       outputPath: absolutePath,
     });
 
-    const artifact = {
-      label: path.basename(absolutePath),
-      url: `/artifacts/${path.basename(absolutePath)}`,
-    };
+    const artifact = await publishArtifactFile({
+      filename: path.basename(absolutePath),
+      localPath: absolutePath,
+      contentType: 'video/mp4',
+    });
     this.taskManager.addDownloadItem(input.task.id, artifact);
 
     return {
@@ -359,7 +403,7 @@ Pastikan component tersebut default exported: 'export default function LandingPa
     }
 
     const slug = this.slugify(input.task.goal);
-    const artifactsDir = path.join(process.cwd(), 'public', 'artifacts');
+    const artifactsDir = getArtifactWorkingDir();
     const imagePath = path.join(artifactsDir, `${slug}-video-frame.png`);
     const absolutePath = path.join(artifactsDir, `${slug}.mp4`);
 
@@ -400,10 +444,11 @@ Pastikan component tersebut default exported: 'export default function LandingPa
       );
     });
 
-    const artifact = {
-      label: path.basename(absolutePath),
-      url: `/artifacts/${path.basename(absolutePath)}`,
-    };
+    const artifact = await publishArtifactFile({
+      filename: path.basename(absolutePath),
+      localPath: absolutePath,
+      contentType: 'video/mp4',
+    });
     this.taskManager.addDownloadItem(input.task.id, artifact);
 
     return {

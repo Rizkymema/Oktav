@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { getRuntimeDataPath } from '@/lib/hermes/runtime/runtime-paths';
 
 export type HermesExecutionMode = 'auto' | 'native' | 'reference';
 
@@ -11,7 +12,7 @@ export interface HermesRuntimeSettingsSnapshot {
   toolEnabledState: Record<string, boolean>;
 }
 
-const DEFAULT_SETTINGS_PATH = path.join(process.cwd(), '.tmp', 'hermes-runtime-settings.json');
+const DEFAULT_SETTINGS_PATH = getRuntimeDataPath('hermes-runtime-settings.json');
 
 const resolveDefaultSettingsPath = () => {
   if (process.env.NODE_ENV === 'test') {

@@ -1,10 +1,11 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import type { Project, NotificationItem, IMChannel } from '@/lib/workspace/types';
+import { getRuntimeDataPath } from '@/lib/hermes/runtime/runtime-paths';
 
-const PROJECTS_PATH = path.join(process.cwd(), '.tmp', 'hermes-projects-state.json');
-const NOTIFICATIONS_PATH = path.join(process.cwd(), '.tmp', 'hermes-notifications-state.json');
-const CHANNELS_PATH = path.join(process.cwd(), '.tmp', 'hermes-channels-state.json');
+const PROJECTS_PATH = getRuntimeDataPath('hermes-projects-state.json');
+const NOTIFICATIONS_PATH = getRuntimeDataPath('hermes-notifications-state.json');
+const CHANNELS_PATH = getRuntimeDataPath('hermes-channels-state.json');
 
 const ensureDirectory = (filePath: string) => {
   const dir = path.dirname(filePath);

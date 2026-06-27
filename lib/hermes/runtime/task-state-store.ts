@@ -4,13 +4,14 @@ import path from 'node:path';
 
 import type { HermesApprovalRequest } from '@/lib/hermes/contracts/approval';
 import type { HermesTaskRecord } from '@/lib/hermes/contracts/task';
+import { getRuntimeDataPath } from '@/lib/hermes/runtime/runtime-paths';
 
 export interface HermesTaskRuntimeSnapshot {
   tasks: HermesTaskRecord[];
   approvals: HermesApprovalRequest[];
 }
 
-const DEFAULT_STATE_PATH = path.join(process.cwd(), '.tmp', 'hermes-runtime-state.json');
+const DEFAULT_STATE_PATH = getRuntimeDataPath('hermes-runtime-state.json');
 
 const resolveDefaultStatePath = () => {
   if (process.env.NODE_ENV === 'test') {

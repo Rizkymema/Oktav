@@ -22,6 +22,18 @@ const nextConfig: NextConfig = {
   },
   // output: 'standalone',
   serverExternalPackages: ['ffmpeg-static'],
+  outputFileTracingIncludes: {
+    '/api/hermes/tasks': ['node_modules/ffmpeg-static/**/*'],
+  },
+  outputFileTracingExcludes: process.env.VERCEL
+    ? {
+        '/api/hermes/tasks': [
+          'integrations/genvid/**/*',
+          '.tmp/hermes-runtime-*-test-*.json',
+          '.tmp/hermes-runtime-settings-test-*.json',
+        ],
+      }
+    : undefined,
   transpilePackages: ['motion'],
   webpack: (config, {dev}) => {
     // HMR is disabled in AI Studio via DISABLE_HMR env var.

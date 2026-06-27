@@ -131,6 +131,79 @@ describe('ToolExecutor', () => {
     expect(fs.readFileSync(artifactPath)).toEqual(Buffer.from([0, 1, 2, 3, 4, 5]));
   });
 
+  test('reuses an existing mp4 download item without requiring local public artifact file', async () => {
+    const taskManager = new InMemoryTaskManager();
+    const eventBus = new EventBus();
+    const toolRegistry = new ToolRegistry();
+    const agentRegistry = new AgentRegistry();
+    const permissionManager = new PermissionManager(agentRegistry, toolRegistry);
+    const approvalManager = new ApprovalManager(taskManager, eventBus);
+    const executor = new ToolExecutor(taskManager, toolRegistry, permissionManager, approvalManager, eventBus);
+
+    const task = taskManager.createTask({
+      goal: 'Video Blob',
+      category: 'document',
+      source: 'Workspace',
+      prompt: 'Buat video untuk blob storage',
+      selectedSkill: 'Videos',
+      outputType: 'mp4',
+    });
+
+    taskManager.addDownloadItem(task.id, {
+      label: 'video-blob.mp4',
+      url: 'https://example.com/video-blob.mp4',
+    });
+
+    const result = await executor.execute({
+      task,
+      agentName: 'Video Agent',
+      toolId: 'filesystem.write_artifact',
+      draftContent: 'Video cloud tidak boleh dianggap hilang.',
+    });
+
+    expect(result.artifact).toEqual({
+      label: 'video-blob.mp4',
+      url: 'https://example.com/video-blob.mp4',
+    });
+    expect(result.content).toContain('video-blob.mp4');
+  });
+
+  test('reuses an existing image download item without rewriting a local artifact file', async () => {
+    const taskManager = new InMemoryTaskManager();
+    const eventBus = new EventBus();
+    const toolRegistry = new ToolRegistry();
+    const agentRegistry = new AgentRegistry();
+    const permissionManager = new PermissionManager(agentRegistry, toolRegistry);
+    const approvalManager = new ApprovalManager(taskManager, eventBus);
+    const executor = new ToolExecutor(taskManager, toolRegistry, permissionManager, approvalManager, eventBus);
+
+    const task = taskManager.createTask({
+      goal: 'Poster Blob',
+      category: 'image',
+      source: 'Workspace',
+      prompt: 'Buat poster blob',
+      selectedSkill: 'Images',
+      outputType: 'png',
+    });
+
+    taskManager.addDownloadItem(task.id, {
+      label: 'poster-blob.png',
+      url: 'https://example.com/poster-blob.png',
+    });
+
+    const result = await executor.execute({
+      task,
+      agentName: 'Image Agent',
+      toolId: 'filesystem.write_artifact',
+      draftContent: 'Poster cloud tidak boleh ditulis ulang ke public/artifacts.',
+    });
+
+    expect(result.artifact).toEqual({
+      label: 'poster-blob.png',
+      url: 'https://example.com/poster-blob.png',
+    });
+  });
+
   test('prefers genvid provider when enabled and healthy', async () => {
     process.env.GENVID_ENABLED = 'true';
     process.env.GENVID_API_URL = 'http://127.0.0.1:8000';
