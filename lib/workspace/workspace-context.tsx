@@ -159,7 +159,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       capabilities: ['chat', 'document', 'spreadsheet', 'web'],
     },
   ]);
-  const [selectedOutputType, setSelectedOutputType] = useState('pdf');
+  const [selectedOutputType, setSelectedOutputType] = useState('auto');
   const [availableOutputTypes] = useState<WorkspaceOutputOption[]>([
     { id: 'pdf', label: 'PDF', desc: 'Dokumen final siap dibagikan' },
     { id: 'pptx', label: 'PPTX', desc: 'Deck presentasi atau pitch deck' },
@@ -547,7 +547,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     const taskIntent = selectedSkill !== null || deepResearchMode || isProjectPrompt(userText);
     const workingLabel = getAssistantWorkingLabel({
       selectedSkill,
-      outputType: selectedOutputType,
+      outputType: selectedOutputType === 'auto' ? undefined : selectedOutputType,
     });
 
     setIsAssistantTyping(true);
@@ -561,7 +561,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
           body: JSON.stringify({
             prompt: userText,
             model: selectedModel,
-            outputType: selectedOutputType,
+            outputType: selectedOutputType === 'auto' ? undefined : selectedOutputType,
             selectedSkill,
           }),
         });
@@ -626,7 +626,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
           prompt: selectedSkill ? `[Skill: ${selectedSkill}] ${userText}` : userText,
           agent_name: targetAgent || undefined,
           model: selectedModel,
-          outputType: selectedOutputType,
+          outputType: selectedOutputType === 'auto' ? undefined : selectedOutputType,
         }),
       });
 
