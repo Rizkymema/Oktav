@@ -1,0 +1,68 @@
+{
+  "title": "Genvid Direct Check",
+  "config": {
+    "task_id": "20260627_183424_941d",
+    "n_storyboard": 3,
+    "min_narration_words": 5,
+    "max_narration_words": 20,
+    "min_image_prompt_words": 30,
+    "max_image_prompt_words": 60,
+    "video_fps": 30,
+    "tts_inference_mode": "local",
+    "voice_id": "zh-CN-YunjianNeural",
+    "tts_workflow": null,
+    "tts_speed": 1.2,
+    "ref_audio": null,
+    "media_width": 1024,
+    "media_height": 1024,
+    "media_workflow": null,
+    "frame_template": "1080x1920/static_default.html",
+    "template_params": null
+  },
+  "frames": [
+    {
+      "index": 0,
+      "narration": "Pernahkah kamu merasa pagi itu, kok, rasanya berat sekali",
+      "image_prompt": null,
+      "audio_path": "D:\\Project Apk-Web\\AI ASSISTENT\\integrations\\genvid\\output\\20260627_183424_941d\\frames\\01_audio.mp3",
+      "media_type": null,
+      "image_path": null,
+      "video_path": null,
+      "composed_image_path": "D:\\Project Apk-Web\\AI ASSISTENT\\integrations\\genvid\\output\\20260627_183424_941d\\frames\\01_composed.png",
+      "video_segment_path": "D:\\Project Apk-Web\\AI ASSISTENT\\integrations\\genvid\\output\\20260627_183424_941d\\frames\\01_segment.mp4",
+      "duration": 4.248,
+      "created_at": "2026-06-27T18:34:26.632688"
+    },
+    {
+      "index": 1,
+      "narration": "Ada baiknya kita fokus pada satu hal terpenting dulu",
+      "image_prompt": null,
+      "audio_path": "D:\\Project Apk-Web\\AI ASSISTENT\\integrations\\genvid\\output\\20260627_183424_941d\\frames\\02_audio.mp3",
+      "media_type": null,
+      "image_path": null,
+      "video_path": null,
+      "composed_image_path": "D:\\Project Apk-Web\\AI ASSISTENT\\integrations\\genvid\\output\\20260627_183424_941d\\frames\\02_composed.png",
+      "video_segment_path": "D:\\Project Apk-Web\\AI ASSISTENT\\integrations\\genvid\\output\\20260627_183424_941d\\frames\\02_segment.mp4",
+      "duration": 3.336,
+      "created_at": "2026-06-27T18:34:26.632688"
+    },
+    {
+      "index": 2,
+      "narration": "Ini bukan soal disiplin, ini tentang energi dan hasil terbaik",
+      "image_prompt": null,
+      "audio_path": "D:\\Project Apk-Web\\AI ASSISTENT\\integrations\\genvid\\output\\20260627_183424_941d\\frames\\03_audio.mp3",
+      "media_type": null,
+      "image_path": null,
+      "video_path": null,
+      "composed_image_path": "D:\\Project Apk-Web\\AI ASSISTENT\\integrations\\genvid\\output\\20260627_183424_941d\\frames\\03_composed.png",
+      "video_segment_path": "D:\\Project Apk-Web\\AI ASSISTENT\\integrations\\genvid\\output\\20260627_183424_941d\\frames\\03_segment.mp4",
+      "duration": 3.936,
+      "created_at": "2026-06-27T18:34:26.632688"
+    }
+  ],
+  "content_metadata": null,
+  "final_video_path": "D:\\Project Apk-Web\\AI ASSISTENT\\integrations\\genvid\\output\\20260627_183424_941d\\final.mp4",
+  "total_duration": 11.52,
+  "created_at": "2026-06-27T18:34:26.632688",
+  "completed_at": "2026-06-27T18:35:52.629533"
+}

@@ -1,0 +1,341 @@
+@import "tailwindcss";
+
+@theme {
+  --color-accent-cyan: #000000; /* Black Accent */
+  --color-accent-cyan-hover: #1a1a1a;
+  --color-bg-obsidian: #FFFFFF; /* Pure White Background */
+  --color-surface-deep: #FFFFFF; /* Pure White Card surface */
+  --color-surface-steel: #F8FAFC; /* Light Slate panel surface */
+  --color-text-ice: #000000; /* Pure Black text */
+  --color-text-slate: #475569; /* Gray text */
+}
+
+@layer base {
+  :root {
+    --font-sans: var(--font-sans), system-ui, -apple-system, sans-serif;
+    --font-mono: var(--font-mono), monospace;
+  }
+}
+
+/* Base resets & improvements for premium look */
+body {
+  background-color: #FFFFFF; /* Pure White Background */
+  color: #000000; /* Pure Black text */
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom modern scrollbar - minimalist and subtle */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F8FAFC;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.12);
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4F46E5; /* Indigo accent touch on hover */
+}
+
+/* Premium micro-dot grid (faint, high-end design, no AI template feeling) */
+.bg-grid {
+  background-size: 32px 32px;
+  background-image: 
+    radial-gradient(ellipse at center, rgba(79, 70, 229, 0.04) 0%, transparent 80%),
+    linear-gradient(to right, rgba(15, 23, 42, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.02) 1px, transparent 1px);
+}
+
+/* Premium radial gradient highlighting */
+.bg-radial-glow {
+  background-image: radial-gradient(circle at 50% 0%, rgba(79, 70, 229, 0.05) 0%, rgba(79, 70, 229, 0.005) 50%, transparent 100%);
+}
+
+/* HAIRLINE BORDERS (Tonal Border Rule) */
+.ds-border {
+  border: 1px solid #E2E8F0;
+}
+
+/* SOLID CONTAINERS */
+.ds-card {
+  background-color: #FFFFFF; /* White Card Surface */
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+}
+
+/* Card hover animation with subtle indigo glow as active cue */
+.ds-card-hover:hover {
+  border-color: rgba(79, 70, 229, 0.25);
+  box-shadow: 0 4px 20px rgba(79, 70, 229, 0.04);
+}
+
+/* PRIMARY BUTTON: Indigo, Bold white text, Capsule shape */
+.ds-btn-primary {
+  background-color: #4F46E5;
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: 9999px;
+  padding: 10px 22px;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.ds-btn-primary:hover:not(:disabled) {
+  background-color: #4338ca;
+  box-shadow: 0 0 16px rgba(79, 70, 229, 0.25);
+}
+
+.ds-btn-primary:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.ds-btn-primary:disabled {
+  background-color: rgba(15, 23, 42, 0.08);
+  color: rgba(15, 23, 42, 0.35);
+  cursor: not-allowed;
+}
+
+/* SECONDARY BUTTON: Solid white, dark text, hairline border, Capsule shape */
+.ds-btn-secondary {
+  background-color: #FFFFFF;
+  color: #475569;
+  font-weight: 600;
+  border-radius: 9999px;
+  padding: 10px 22px;
+  font-size: 13px;
+  border: 1px solid #E2E8F0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+}
+
+.ds-btn-secondary:hover:not(:disabled) {
+  background-color: #F8FAFC;
+  border-color: #CBD5E1;
+  color: #0F172A;
+}
+
+.ds-btn-secondary:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.ds-btn-secondary:disabled {
+  background-color: rgba(15, 23, 42, 0.02);
+  color: rgba(15, 23, 42, 0.25);
+  border-color: rgba(15, 23, 42, 0.08);
+  cursor: not-allowed;
+}
+
+/* STANDARD INPUT FIELDS */
+.ds-input {
+  background-color: #FFFFFF;
+  color: #0F172A;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ds-input:focus {
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+}
+
+.ds-input::placeholder {
+  color: rgba(15, 23, 42, 0.45);
+}
+
+/* Sidebar active tab styling */
+.ds-active-tab {
+  background-color: #EEF2FF;
+  border-left: 2px solid #4F46E5;
+  color: #4F46E5;
+  font-weight: 600;
+}
+
+/* Console logs styling (information dense, Monospace, crisp) */
+.ds-console {
+  background-color: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+}
+
+/* Micro-animations */
+@keyframes smoothFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: smoothFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Pulse animation for active gateway/actions */
+@keyframes softPulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 4px rgba(79, 70, 229, 0.2);
+  }
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 12px rgba(79, 70, 229, 0.5);
+  }
+}
+
+.ds-pulse {
+  animation: softPulse 2.5s infinite ease-in-out;
+}
+
+/* Loading shimmer skeleton screens */
+@keyframes shimmerAnim {
+  0 {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.ds-shimmer {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.015) 25%, rgba(255, 255, 255, 0.06) 50%, rgba(255, 255, 255, 0.015) 75%);
+  background-size: 200% 100%;
+  animation: shimmerAnim 1.6s infinite linear;
+}
+
+/* Glassmorphism accent style */
+.ds-glass {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(12px);
+  border: 1px solid #E2E8F0;
+}
+
+/* Slide in from right animation */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ==========================================================================
+   COMPREHENSIVE COLOR PALETTE OVERRIDES (BENTO PREMIUM LIGHT MODE)
+   ========================================================================== */
+
+/* 1. Body and general backgrounds */
+html,
+body {
+  background-color: #F8FAFC !important;
+  color: #0F172A !important;
+}
+
+/* Compatibility classes mapping dark to light */
+.bg-\[\#0c0b09\],
+.bg-\[\#0a0a09\],
+.bg-\[\#050814\] {
+  background-color: #F8FAFC !important;
+}
+
+.bg-\[\#11100e\],
+.bg-\[\#12110f\] {
+  background-color: #FFFFFF !important;
+}
+
+.border-white\/8,
+.border-white\/5,
+.border-white\/10,
+.border-white\/12,
+.border-white\/15,
+.border-white\/20,
+.border-\[\#d4c2a1\]\/20 {
+  border-color: #E2E8F0 !important;
+}
+
+.text-stone-400,
+.text-stone-500,
+.text-slate-400,
+.text-slate-500 {
+  color: #64748B !important;
+}
+
+.text-stone-600,
+.text-slate-655,
+.text-slate-600 {
+  color: #475569 !important;
+}
+
+.text-\[\#d4c2a1\],
+.text-\[\#f2dfbe\],
+.text-accent-cyan {
+  color: #0F172A !important;
+}
+
+.bg-accent-cyan,
+.bg-\[\#00d2ff\],
+.bg-\[\#d4c2a1\],
+.bg-black {
+  background-color: #0F172A !important;
+  color: #FFFFFF !important;
+}
+
+.hover\:bg-accent-cyan-hover:hover,
+.hover\:bg-\[\#38bdf8\]:hover,
+.hover\:bg-slate-800:hover {
+  background-color: #1E293B !important;
+}
+
+/* Bento custom styles */
+.bento-card {
+  background-color: #FFFFFF;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 24px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.01), 0 8px 24px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bento-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(148, 163, 184, 0.4);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.04);
+}
+

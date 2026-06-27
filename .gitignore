@@ -1,0 +1,25 @@
+.next/
+node_modules/
+tsconfig.tsbuildinfo
+
+.env.local
+.env.production.local
+
+.next-dev.log
+.next-dev.err.log
+.next-start.log
+.next-start.err.log
+
+.impeccable/
+.playwright-mcp/
+Skill Power/
+
+.tmp/*
+!.tmp/.gitkeep
+
+integrations/genvid/config.yaml
+integrations/genvid/logs/*.log
+integrations/genvid/.venv/
+
+public/artifacts/*
+!public/artifacts/.gitkeep
