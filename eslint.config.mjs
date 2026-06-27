@@ -7,6 +7,13 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default defineConfig([{
-    ignores: ["public/artifacts/**"],
+    ignores: [
+        ".next/**",
+        ".tmp/**",
+        ".vercel/**",
+        "node_modules/**",
+        "public/artifacts/**",
+        "tsconfig.tsbuildinfo",
+    ],
     extends: [...next],
 }]);

@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
+    "lint": "eslint app components lib tests types eslint.config.mjs next.config.ts vitest.config.ts",
     "clean": "next clean",
     "test": "vitest run"
   },

@@ -1,0 +1,24 @@
+.agents
+.codex
+.git
+.impeccable
+.next
+.playwright-mcp
+.tmp
+Skill Power
+docs
+integrations
+node_modules
+tests
+.env.local
+.env.production.local
+.next-dev.log
+.next-dev.err.log
+.next-start.log
+.next-start.err.log
+plan.md
+prd.md
+task.md
+task1.md
+task-frontend.md
+skill.md
