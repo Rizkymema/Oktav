@@ -31,6 +31,9 @@ afterEach(() => {
   delete process.env.GENVID_POLL_INTERVAL_MS;
   delete process.env.GENVID_POLL_TIMEOUT_MS;
   delete process.env.GENVID_FALLBACK_MODE;
+  delete process.env.OPENAI_API_KEY;
+  delete process.env.HERMES_ALLOW_SYNTHETIC_IMAGE_FALLBACK;
+  delete process.env.HERMES_ALLOW_SYNTHETIC_VIDEO_FALLBACK;
 });
 
 describe('ToolExecutor', () => {
@@ -96,6 +99,99 @@ describe('ToolExecutor', () => {
     expect(result.artifact?.label.endsWith('.mp4')).toBe(true);
     expect(fs.readFileSync(artifactPath).length).toBeGreaterThan(64);
   }, 20000);
+
+  test('does not report video success when only the synthetic fallback is available', async () => {
+    process.env.HERMES_ALLOW_SYNTHETIC_VIDEO_FALLBACK = 'false';
+
+    const taskManager = new InMemoryTaskManager();
+    const eventBus = new EventBus();
+    const toolRegistry = new ToolRegistry();
+    const agentRegistry = new AgentRegistry();
+    const permissionManager = new PermissionManager(agentRegistry, toolRegistry);
+    const approvalManager = new ApprovalManager(taskManager, eventBus);
+    const executor = new ToolExecutor(taskManager, toolRegistry, permissionManager, approvalManager, eventBus);
+
+    const task = taskManager.createTask({
+      goal: 'Video Tanpa Engine Nyata',
+      category: 'document',
+      source: 'Workspace',
+      prompt: 'Buat video promosi produk baru',
+      selectedSkill: 'Videos',
+      outputType: 'mp4',
+    });
+
+    const result = await executor.execute({
+      task,
+      agentName: 'Video Agent',
+      toolId: 'video.generate_mp4',
+    });
+
+    expect(result.artifact).toBeUndefined();
+    expect(result.content).toContain('provider video');
+  });
+
+  test('uses the video provider output instead of the synthetic fallback', async () => {
+    process.env.OPENAI_API_KEY = 'oa-key';
+    process.env.HERMES_ALLOW_SYNTHETIC_VIDEO_FALLBACK = 'false';
+
+    const providerVideo = Buffer.from([0, 0, 0, 24, 102, 116, 121, 112, 105, 115, 111, 109]);
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            id: 'video_123',
+            status: 'queued',
+            progress: 0,
+          }),
+          { status: 200 },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            id: 'video_123',
+            status: 'completed',
+            progress: 100,
+          }),
+          { status: 200 },
+        ),
+      )
+      .mockResolvedValueOnce(new Response(providerVideo, { status: 200 }));
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    const taskManager = new InMemoryTaskManager();
+    const eventBus = new EventBus();
+    const toolRegistry = new ToolRegistry();
+    const agentRegistry = new AgentRegistry();
+    const permissionManager = new PermissionManager(agentRegistry, toolRegistry);
+    const approvalManager = new ApprovalManager(taskManager, eventBus);
+    const executor = new ToolExecutor(taskManager, toolRegistry, permissionManager, approvalManager, eventBus);
+
+    const task = taskManager.createTask({
+      goal: 'Video Kucing Makan',
+      category: 'document',
+      source: 'Workspace',
+      prompt: 'Buat video kucing makan',
+      selectedSkill: 'Videos',
+      outputType: 'mp4',
+    });
+
+    const result = await executor.execute({
+      task,
+      agentName: 'Video Agent',
+      toolId: 'video.generate_mp4',
+    });
+
+    const artifactPath = path.join(process.cwd(), 'public', 'artifacts', result.artifact!.label);
+    createdFiles.push(artifactPath);
+
+    expect(fetchMock.mock.calls[0]?.[0]).toBe('https://api.openai.com/v1/videos');
+    expect(fetchMock.mock.calls[1]?.[0]).toBe('https://api.openai.com/v1/videos/video_123');
+    expect(fetchMock.mock.calls[2]?.[0]).toBe('https://api.openai.com/v1/videos/video_123/content');
+    expect(fs.readFileSync(artifactPath)).toEqual(providerVideo);
+  });
 
   test('does not overwrite an existing mp4 artifact during write_artifact', async () => {
     const taskManager = new InMemoryTaskManager();
@@ -202,6 +298,85 @@ describe('ToolExecutor', () => {
       label: 'poster-blob.png',
       url: 'https://example.com/poster-blob.png',
     });
+  });
+
+  test('uses the image provider output instead of the local placeholder renderer', async () => {
+    process.env.OPENAI_API_KEY = 'oa-key';
+
+    const providerPng = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+y2WQAAAAASUVORK5CYII=',
+      'base64',
+    );
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: [{ b64_json: providerPng.toString('base64') }],
+        }),
+        { status: 200 },
+      ),
+    );
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    const taskManager = new InMemoryTaskManager();
+    const eventBus = new EventBus();
+    const toolRegistry = new ToolRegistry();
+    const agentRegistry = new AgentRegistry();
+    const permissionManager = new PermissionManager(agentRegistry, toolRegistry);
+    const approvalManager = new ApprovalManager(taskManager, eventBus);
+    const executor = new ToolExecutor(taskManager, toolRegistry, permissionManager, approvalManager, eventBus);
+
+    const task = taskManager.createTask({
+      goal: 'Gambar Kucing Makan',
+      category: 'image',
+      source: 'Workspace',
+      prompt: 'Buatkan saya gambar kucing makan',
+      selectedSkill: 'Images',
+      outputType: 'png',
+    });
+
+    const result = await executor.execute({
+      task,
+      agentName: 'Image Agent',
+      toolId: 'image.generate_asset',
+    });
+
+    const artifactPath = path.join(process.cwd(), 'public', 'artifacts', result.artifact!.label);
+    createdFiles.push(artifactPath);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0]?.[0]).toBe('https://api.openai.com/v1/images/generations');
+    expect(fs.readFileSync(artifactPath)).toEqual(providerPng);
+  });
+
+  test('does not report image success when no real image provider is available', async () => {
+    process.env.HERMES_ALLOW_SYNTHETIC_IMAGE_FALLBACK = 'false';
+
+    const taskManager = new InMemoryTaskManager();
+    const eventBus = new EventBus();
+    const toolRegistry = new ToolRegistry();
+    const agentRegistry = new AgentRegistry();
+    const permissionManager = new PermissionManager(agentRegistry, toolRegistry);
+    const approvalManager = new ApprovalManager(taskManager, eventBus);
+    const executor = new ToolExecutor(taskManager, toolRegistry, permissionManager, approvalManager, eventBus);
+
+    const task = taskManager.createTask({
+      goal: 'Kucing Makan Tanpa Provider',
+      category: 'image',
+      source: 'Workspace',
+      prompt: 'Buatkan saya gambar kucing makan',
+      selectedSkill: 'Images',
+      outputType: 'png',
+    });
+
+    const result = await executor.execute({
+      task,
+      agentName: 'Image Agent',
+      toolId: 'image.generate_asset',
+    });
+
+    expect(result.artifact).toBeUndefined();
+    expect(result.content).toContain('provider image');
   });
 
   test('prefers genvid provider when enabled and healthy', async () => {
