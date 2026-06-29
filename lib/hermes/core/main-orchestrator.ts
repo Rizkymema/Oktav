@@ -58,6 +58,9 @@ export const shouldUseNativeExecution = (input: {
   skillName?: string;
   requestedCapability?: string;
 }) => {
+  const nativeCapabilities = new Set(['presentation', 'document', 'spreadsheet', 'image', 'video']);
+  const nativeSkills = new Set(['Slides', 'Documents', 'Sheets', 'Images', 'Videos']);
+
   if (input.executionMode === 'native') {
     return true;
   }
@@ -70,11 +73,10 @@ export const shouldUseNativeExecution = (input: {
     return true;
   }
 
-  if (input.skillName === 'Images' || input.requestedCapability === 'image') {
-    return true;
-  }
-
-  if (input.skillName === 'Videos' || input.requestedCapability === 'video') {
+  if (
+    (input.skillName && nativeSkills.has(input.skillName)) ||
+    (input.requestedCapability && nativeCapabilities.has(input.requestedCapability))
+  ) {
     return true;
   }
 

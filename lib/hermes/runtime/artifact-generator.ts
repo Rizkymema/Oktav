@@ -76,6 +76,16 @@ const toLines = (value: string, size = 56) => {
   return lines;
 };
 
+const sanitizeForWinAnsi = (value: string) =>
+  value
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\u2013\u2014]/g, '-')
+    .replace(/\u2026/g, '...')
+    .replace(/[^\x20-\x7E]/g, '');
+
 const createSectionedSlides = (goal: string, content: string) => {
   const sections = toParagraphs(content);
   if (sections.length === 0) {
@@ -227,9 +237,10 @@ const createPdfBytes = async (goal: string, content: string) => {
   const page = pdf.addPage([595, 842]);
   const font = await pdf.embedFont(StandardFonts.Helvetica);
   const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
-  const lines = toLines(content || goal, 82);
+  const safeGoal = sanitizeForWinAnsi(goal);
+  const lines = toLines(sanitizeForWinAnsi(content || goal), 82);
 
-  page.drawText(goal, {
+  page.drawText(safeGoal, {
     x: 48,
     y: 780,
     size: 20,

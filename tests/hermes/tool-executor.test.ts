@@ -336,4 +336,38 @@ describe('ToolExecutor', () => {
       expect(fileBuffer.subarray(0, scenario.expectedPrefix.length).toString('utf8')).toBe(scenario.expectedPrefix);
     }
   }, 20000);
+
+  test('writes pdf artifacts even when AI text contains emoji characters', async () => {
+    const taskManager = new InMemoryTaskManager();
+    const eventBus = new EventBus();
+    const toolRegistry = new ToolRegistry();
+    const agentRegistry = new AgentRegistry();
+    const permissionManager = new PermissionManager(agentRegistry, toolRegistry);
+    const approvalManager = new ApprovalManager(taskManager, eventBus);
+    const executor = new ToolExecutor(taskManager, toolRegistry, permissionManager, approvalManager, eventBus);
+
+    const task = taskManager.createTask({
+      goal: 'Dokumen Emoji Kucing',
+      category: 'document',
+      source: 'Workspace',
+      prompt: 'Buat PDF tentang kucing 😹 yang berlari',
+      selectedSkill: 'Documents',
+      outputType: 'pdf',
+    });
+
+    const result = await executor.execute({
+      task,
+      agentName: 'Document Agent',
+      toolId: 'filesystem.write_artifact',
+      draftContent: 'Kucing 😹 berlari sangat cepat di taman kota.',
+    });
+
+    const artifactPath = path.join(process.cwd(), 'public', 'artifacts', result.artifact!.label);
+    createdFiles.push(artifactPath);
+
+    const fileBuffer = fs.readFileSync(artifactPath);
+    expect(result.artifact?.label.endsWith('.pdf')).toBe(true);
+    expect(fileBuffer.length).toBeGreaterThan(32);
+    expect(fileBuffer.subarray(0, 4).toString('utf8')).toBe('%PDF');
+  });
 });

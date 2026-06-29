@@ -57,7 +57,7 @@ describe('Hermes registries', () => {
     expect(result.requestedCapability).toBe('presentation');
   });
 
-  test('routes image generation through native execution path', () => {
+  test('routes binary artifact generation through native execution path', () => {
     expect(
       shouldUseNativeExecution({
         executionMode: 'auto',
@@ -74,7 +74,25 @@ describe('Hermes registries', () => {
         skillName: 'Documents',
         requestedCapability: 'document',
       }),
-    ).toBe(false);
+    ).toBe(true);
+
+    expect(
+      shouldUseNativeExecution({
+        executionMode: 'auto',
+        hasReferenceWorkspace: true,
+        skillName: 'Slides',
+        requestedCapability: 'presentation',
+      }),
+    ).toBe(true);
+
+    expect(
+      shouldUseNativeExecution({
+        executionMode: 'auto',
+        hasReferenceWorkspace: true,
+        skillName: 'Sheets',
+        requestedCapability: 'spreadsheet',
+      }),
+    ).toBe(true);
 
     expect(
       shouldUseNativeExecution({
