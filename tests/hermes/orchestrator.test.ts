@@ -1,4 +1,7 @@
-import { describe, expect, test } from 'vitest';
+import fs from 'node:fs';
+import path from 'node:path';
+
+import { afterEach, describe, expect, test } from 'vitest';
 
 import { GoalAnalyzer } from '@/lib/hermes/core/goal-analyzer';
 import { MainOrchestrator, shouldUseNativeExecution } from '@/lib/hermes/core/main-orchestrator';
@@ -115,6 +118,11 @@ describe('Hermes registries', () => {
 });
 
 describe('Hermes orchestration flow', () => {
+  afterEach(() => {
+    delete process.env.OPENAI_API_KEY;
+    delete process.env.HERMES_ALLOW_SYNTHETIC_IMAGE_FALLBACK;
+  });
+
   const createOrchestrator = () => {
     const taskManager = new InMemoryTaskManager();
     const eventBus = new EventBus();
@@ -267,5 +275,31 @@ describe('Hermes orchestration flow', () => {
     expect(storedTask?.status).toBe('completed');
     expect(storedTask?.result).not.toContain('Hasil sintetis');
     expect(storedTask?.downloadItems[0]?.label).toMatch(/\.(png|svg)$/i);
+  }, 15000);
+
+  test('fails an image task when no real artifact is produced', async () => {
+    process.env.HERMES_ALLOW_SYNTHETIC_IMAGE_FALLBACK = 'false';
+    const artifactPath = path.join(process.cwd(), 'public', 'artifacts', 'buat-gambar-kucing-makan.png');
+
+    try {
+      fs.unlinkSync(artifactPath);
+    } catch {}
+
+    const { taskManager, orchestrator } = createOrchestrator();
+
+    const task = await orchestrator.submit({
+      goal: 'Buat gambar kucing makan',
+      prompt: 'Buat gambar kucing makan',
+      source: 'Workspace',
+      category: 'image',
+      selectedSkill: 'Images',
+      outputType: 'png',
+    });
+
+    const storedTask = taskManager.getTask(task.id);
+
+    expect(storedTask?.status).toBe('failed');
+    expect(storedTask?.downloadItems).toHaveLength(0);
+    expect(storedTask?.summary).toContain('Artifact');
   }, 15000);
 });

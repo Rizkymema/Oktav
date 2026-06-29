@@ -537,6 +537,7 @@ Pastikan component tersebut default exported: 'export default function LandingPa
         const slug = this.slugify(input.task.goal);
         const requestedType = this.resolveOutputType(input.task);
         let extension = requestedType || 'md';
+        const isImageSkill = input.task.skillId === 'Images';
         if (input.task.skillId === 'Images') {
           const imageTypes = ['png', 'jpg', 'jpeg', 'svg'];
           extension = imageTypes.includes(requestedType) ? requestedType : 'png';
@@ -555,6 +556,24 @@ Pastikan component tersebut default exported: 'export default function LandingPa
         const absolutePath = path.join(getArtifactWorkingDir(), filename);
 
         await fs.promises.mkdir(path.dirname(absolutePath), { recursive: true });
+
+        if (isImageSkill) {
+          if (!fs.existsSync(absolutePath)) {
+            return {
+              content: 'Artifact image belum tersedia.',
+            };
+          }
+
+          const artifact = {
+            label: filename,
+            url: relativeUrl,
+          };
+          this.taskManager.addDownloadItem(input.task.id, artifact);
+          return {
+            content: `Artifact ${artifact.label} berhasil disiapkan.`,
+            artifact,
+          };
+        }
 
         if (extension === 'mp4') {
           const existingArtifact =
@@ -591,14 +610,12 @@ Pastikan component tersebut default exported: 'export default function LandingPa
           fileContent = `ID,Tanggal,Nama,Total Penjualan,Kategori\n1,2026-06-01,Produk Premium,15000000,Elektronik\n2,2026-06-02,Produk Hemat,5400000,Kecantikan\n3,2026-06-03,Paket Spesial,12300000,Makanan`;
         }
 
-        if (!(input.task.skillId === 'Images' && fs.existsSync(absolutePath))) {
-          await generateArtifactFile({
-            goal: input.task.goal,
-            content: fileContent,
-            outputPath: absolutePath,
-            outputType: extension as any,
-          });
-        }
+        await generateArtifactFile({
+          goal: input.task.goal,
+          content: fileContent,
+          outputPath: absolutePath,
+          outputType: extension as any,
+        });
 
         const artifact = {
           label: filename,

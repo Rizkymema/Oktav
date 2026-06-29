@@ -300,6 +300,40 @@ describe('ToolExecutor', () => {
     });
   });
 
+  test('does not synthesize a png artifact during write_artifact when the real image file is missing', async () => {
+    const taskManager = new InMemoryTaskManager();
+    const eventBus = new EventBus();
+    const toolRegistry = new ToolRegistry();
+    const agentRegistry = new AgentRegistry();
+    const permissionManager = new PermissionManager(agentRegistry, toolRegistry);
+    const approvalManager = new ApprovalManager(taskManager, eventBus);
+    const executor = new ToolExecutor(taskManager, toolRegistry, permissionManager, approvalManager, eventBus);
+    const artifactPath = path.join(process.cwd(), 'public', 'artifacts', 'poster-gagal-provider.png');
+
+    try {
+      fs.unlinkSync(artifactPath);
+    } catch {}
+
+    const task = taskManager.createTask({
+      goal: 'Poster Gagal Provider',
+      category: 'image',
+      source: 'Workspace',
+      prompt: 'Buat poster yang seharusnya gagal',
+      selectedSkill: 'Images',
+      outputType: 'png',
+    });
+
+    const result = await executor.execute({
+      task,
+      agentName: 'Image Agent',
+      toolId: 'filesystem.write_artifact',
+      draftContent: 'Ini tidak boleh berubah menjadi file PNG fallback.',
+    });
+
+    expect(result.artifact).toBeUndefined();
+    expect(result.content).toContain('Artifact image belum tersedia');
+  });
+
   test('uses the image provider output instead of the local placeholder renderer', async () => {
     process.env.OPENAI_API_KEY = 'oa-key';
 
